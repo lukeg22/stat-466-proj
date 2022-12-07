@@ -1,0 +1,68 @@
+## Read in Libraries
+library(readr)
+library(rlang)
+library(dplyr)
+
+
+## Read in Data
+worldcup <- read_csv("FIFA World Cup.csv")
+View(worldcup)
+
+## Simple Random Sampling
+
+### Find Sample Size
+
+N<- 21
+B <- 3450
+std <- sd(worldcup$Averageattendance)
+(N*(std^2))/((N-1)*(B^2/(4))+std^2)
+
+### Take Simple Random Sample
+
+sample_n()
+
+
+## Stratified Random Sampling
+We are going to stratify this data by the continent that the tournament was held in.
+We are using three different continents, which will be Europe, South America, and other.
+Russia will count in the Europe category.
+### Find Sample Size
+
+
+
+
+N <- c(5,11,5 )
+s2 <- c( , , )
+B <- 
+a <- 1/length(N)
+n <- sum(N^2*s2/a)/((sum(N))^2*B^2/4+sum(N*s2))
+n
+n*a
+
+### Take Stratified Random Sample
+
+
+sample_n()
+
+
+## Systematic Random Sampling
+
+### Find Sample Size
+
+N <- 21
+s2 <- (sd(worldcup$Averageattendance))^2
+B <- 3450
+
+(N*s2)/((N-1)*(B^2)/(4)+s2)
+
+### Take Systematic Random Sample
+
+
+##Getting a 1-in-
+k<- 
+#Select the first term
+starting <- sample(x = k,size = 1)
+#Select every 10th passenger
+samples <- seq(starting,nrow(worldcup),by=k)
+#Collect age data for our sample
+values <- worldcup[samples,]
