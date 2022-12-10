@@ -1,0 +1,159 @@
+## Read in Libraries
+library(readr)
+library(rlang)
+library(dplyr)
+
+
+## Read in Data
+worldcup <- read_csv("~/Desktop/FIFA World Cup.csv")
+View(worldcup)
+
+## Simple Random Sampling
+
+### Find Sample Size
+
+N<- 21
+B <- 5000
+std <- sd(worldcup$Averageattendance)
+s2 <- std^2
+simplesize <- (N*(std^2))/((N-1)*(B^2/(4))+std^2)
+simplesize
+n <- 11
+
+Var <- ((1-n/N)*(s2/n))
+
+### Take Simple Random Sample
+
+simpleset <- sample_n(worldcup, 11)
+View(simpleset)
+meansimple <- mean(simpleset$Averageattendance)
+sd(simpleset$Averageattendance)^2
+
+### Caluatling CI
+To calculate the confidence interval of the mean we are using the formula of 
+Ybar (+ & -) 2 multiplied by the square root of the variance. Being multiplied by 2
+represents the amount of standard deviations from the mean resulting in the 95% confidence
+
+meansimple + (2*sqrt(Var))
+meansimple - (2*sqrt(Var))
+
+## Stratified Random Sampling
+
+We are going to stratify this data by the continent that the tournament was held in.
+We are using three different continents, which will be Europe, South America, and other.
+Russia will count in the Europe category.
+### Find Sample Size
+
+
+
+hostssplit <- split(worldcup, worldcup$Hosts)
+brazilsplit <- hostssplit$` Brazil`
+argsplit <- hostssplit$` Argentina`
+chisplit <- hostssplit$` Chile`
+engsplit <- hostssplit$` England`
+fransplit <- hostssplit$` France`
+germsplit <- hostssplit$` Germany`
+itasplit <- hostssplit$` Italy`
+mexsplit <- hostssplit$` Mexico`
+russplit <- hostssplit$` Russia`
+southafsplit <- hostssplit$` South Africa`
+skjsplit <- hostssplit$` South Korea Japan`
+spainsplit <- hostssplit$` Spain`
+swedesplit <- hostssplit$` Sweden`
+switzsplit <- hostssplit$` Switzerland`
+ussplit <- hostssplit$` United States`
+urugsplit <- hostssplit$` Uruguay`
+wgsplit <- hostssplit$` West Germany`
+
+
+sa1 <- full_join(brazilsplit,argsplit)
+sa2 <- full_join(sa1, chisplit)
+sa3 <- full_join(sa2, urugsplit)
+
+oth1 <- full_join(ussplit, mexsplit)
+oth2 <- full_join(oth1,skjsplit)
+oth3 <- full_join(oth2, southafsplit)
+
+eur1 <- full_join(engsplit, fransplit)
+eur2 <- full_join(eur1,germsplit )
+eur3 <- full_join(eur2,itasplit)
+eur4 <- full_join(eur3,russplit )
+eur5 <- full_join(eur4, spainsplit)
+eur6 <- full_join(eur5, swedesplit)
+eur7 <- full_join(eur6, switzsplit)
+eur8 <- full_join(eur7, wgsplit)
+
+
+Ni <- c(5,11,5)
+N <- 21
+s2 <- c((sd(sa3$Averageattendance))^2,(sd(eur8$Averageattendance))^2,(sd(oth3$Averageattendance))^2)
+B <- 5000
+a <- 1/length(N)
+ni <- c(3,7,3)
+n <- sum(N^2*s2/a)/((sum(N))^2*B^2/4+sum(N*s2))
+n
+We have a total sample size of 13, and that should be distributed as 3 to South America and other, and 7 to Europe.
+Var <- (1/N^2)*(sum((Ni*((1-ni/Ni))*(s2/ni))))
+
+
+### Take Stratified Random Sample
+
+
+stratifiedsetoth <- sample_n(oth3, 3)
+stratifiedsetsa <- sample_n(sa3, 3)
+stratifiedseteur <- sample_n(eur8, 7)
+othsa <- full_join(stratifiedsetoth, stratifiedseteur)
+stratifiedset <- full_join(othsa, stratifiedsetsa)
+
+View(stratifiedset)
+stratimean <- mean(stratifiedset$Averageattendance)
+
+###Calculating CI
+To calculate the confidence interval of the mean we are using the formula of 
+Ybar (+ & -) 2 multiplied by the square root of the variance. Being multiplied by 2
+represents the amount of standard deviations from the mean resulting in the 95% confidence
+
+stratimean + (2*sqrt(Var))
+stratimean - (2*sqrt(Var))
+
+
+## Systematic Random Sampling
+
+### Find Sample Size
+
+N <- 21
+s2 <- (sd(worldcup$Averageattendance))^2
+B <- 5000
+systematicsize <- (N*s2)/((N-1)*(B^2)/(4)+s2)
+systematicsize
+n <- 11
+Var <- ((1-n/N)*(s2/n))
+
+
+### Take Systematic Random Sample
+
+
+##Getting a 1-in-2
+k<- 2
+#Select the first term
+starting <- sample(x = (k-1),size = 1)
+#Select every 10th passenger
+samples <- seq(starting,nrow(worldcup),by=k)
+#Collect age data for our sample
+values <- worldcup[samples,]
+View(values)
+
+meansystematic <- mean(values$Averageattendance)
+meansystematic
+
+
+
+
+### Calculate CI
+
+To calculate the confidence interval of the mean we are using the formula of 
+Ybar (+ & -) 2 multiplied by the square root of the variance. Being multiplied by 2
+represents the amount of standard deviations from the mean resulting in the 95% confidence
+
+meansystematic + (2*sqrt(Var))
+meansystematic - (2*sqrt(Var))
